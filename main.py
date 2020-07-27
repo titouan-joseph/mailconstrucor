@@ -2,14 +2,16 @@ import argparse
 import os
 
 
-def mail(file, domain, outputFile):
-
-    if os.path.exists(outputFile):
-        print("Error file exists")
-        exit(-1)
+def mail(file, domain, outputFile, overwrite):
 
     if not outputFile.endswith(".txt"):
         outputFile = outputFile + ".txt"
+
+    if os.path.exists(outputFile) and not overwrite:
+        print("Error file exists")
+        exit(-1)
+    elif overwrite:
+        os.remove(outputFile)
 
     with open(file, "r") as data:
         data.readline()
@@ -28,5 +30,9 @@ if __name__ == '__main__':
     parser.add_argument("file", help="csv file with ';' separator and gender;last name;fisrt name")
     parser.add_argument("-d", "--domain", help="domain of email example: domain.com", default="insa-lyon.fr")
     parser.add_argument("-o", "--output", help="output file", default="output.txt")
+    parser.add_argument("--overwrite", help="overwrite output file", action='store_true')
     args = parser.parse_args()
-    mail(args.file, args.domain, args.output)
+    if args.overwrite:
+        mail(args.file, args.domain, args.output, True)
+    else:
+        mail(args.file, args.domain, args.output, False)
